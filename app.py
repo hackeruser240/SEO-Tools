@@ -120,13 +120,25 @@ def broken_link():
 
 @app.route('/advanced-online-paraphrasing-tool',methods=['GET','POST'])
 def paraphrase():
-    form=Article_Rewriter()
-    if form.validate_on_submit():
-        content=form.paragraph.data
-        text=rewrite_article(content)
+    form = Article_Rewriter()
+    text = ""  # Initialize text for GET requests or if form validation fails
 
-        return render_template('paraphrase.html',text=text,form=form)
-    return render_template("paraphrase.html",form=form)
+    if form.validate_on_submit():
+        content = form.paragraph.data
+        print(f"DEBUG: Input content received: {content[:100]}...") # Print first 100 characters of input
+
+        try:
+            text = rewrite_article(content)
+            print(f"DEBUG: Rewritten text generated: {text[:100]}...") # Print first 100 characters of output
+        except Exception as e:
+            text = f"An error occurred during article rewriting: {e}"
+            print(f"ERROR: rewrite_article function failed: {e}")
+
+        return render_template('paraphrase.html', text=text, form=form)
+    
+    # This block handles GET requests or when form validation fails (e.g., initial page load)
+    return render_template("paraphrase.html", form=form, text=text)
+
 @app.route("/discover-profitable-keywords",methods=['POST',"GET"])
 def keyword():
     form=SearchForm()
