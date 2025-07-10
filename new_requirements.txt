@@ -1,0 +1,15 @@
+requests
+beautifulsoup4
+nltk
+matplotlib
+PyPDF2
+python-docx
+google-search-results # For serpapi.GoogleSearch
+gTTS
+pydub
+easyocr
+ip2geotools
+python-whois # For whois
+deep-translator
+bitarray
+setuptools # Often required for building some packages
