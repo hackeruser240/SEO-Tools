@@ -899,17 +899,31 @@ def create_metatags():
 @app.route("/encrypt-password-proctect-your-files",methods=['GET','POST'])
 def encrypt_pdf_files():
     if request.method == 'POST':
-        file = request.files.get('files')
+        # --- THIS IS THE CRUCIAL CHANGE ---
+        # Now expecting the file under the name 'file-upload' as defined in the HTML
+        file = request.files.get('file-upload')
+        # --- END OF CRUCIAL CHANGE ---
+
         password = request.form.get('password')
-        if file and (file.filename.endswith('.pdf')):
-            file_to_download = password_protect_pdf(file,password)
-            return send_file(
-        BytesIO(file_to_download),
-        download_name="Password_Protected.pdf",
-        as_attachment=True
-    )
+
+        if file and file.filename: # Check if a file was actually uploaded and has a name
+            if file.filename.endswith('.pdf'):
+                try:
+                    file_to_download = password_protect_pdf(file, password)
+                    return send_file(
+                        BytesIO(file_to_download),
+                        download_name="Password_Protected.pdf",
+                        as_attachment=True,
+                        mimetype='application/pdf' # Explicitly set mimetype for PDF download
+                    )
+                except Exception as e:
+                    # Catch any errors during PDF processing and flash a message
+                    flash(f'Error processing PDF: {e}', 'error')
+                    print(f"Error processing PDF: {e}") # Log the error for debugging
+            else:
+                flash('Kindly upload PDF files only, other formats are not supported', 'info')
         else:
-            flash('info kindly upload pdf files only, other formates are not supported','info')
+            flash('No file uploaded or file is empty.', 'info') # Handle case where no file is selected/uploaded
     return render_template("file_encryption.html")
 
 
